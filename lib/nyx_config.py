@@ -28,10 +28,16 @@ class NyxConfig():
     @classmethod
     def get_rpc_creds(self, data, network='mainnet'):
         # get rpc info from nyx.conf
-        match = re.findall(r'rpc(user|password|port)=(.*?)$', data, re.MULTILINE)
+        match = re.findall(r'rpc(user|password|port|connect|bind)=(.*?)$', data, re.MULTILINE)
 
         # python >= 2.7
         creds = {key: value for (key, value) in match}
+        
+        # fetch host from nyx-config using rpcbind or rpcconnect
+        if ('bind' in creds):
+            creds['host'] = creds['bind']
+        elif('connect' in creds):
+            creds['host'] = creds['connect']
 
         # standard Nyx defaults...
         default_port = 4331 if (network == 'mainnet') else 4333
